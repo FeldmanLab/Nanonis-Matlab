@@ -1,9 +1,0 @@
-function coarse_z(Dir)
-    
-    e = actxserver('LabVIEW.Application');
-    vipath = 'C:\Users\STM\Documents\LabVIEW Data\Nanonis PI\Coarse_z.vi'
-    vi = invoke(e, 'GetVIReference',vipath);
-    case
-    vi.SetControlValue('Direction',Dir);
-    vi.Run;
-end
