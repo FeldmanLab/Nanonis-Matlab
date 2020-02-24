@@ -1,0 +1,49 @@
+function [dudn, un] = AppCompAnalysis(ax1, ax2, ax3, ax4, ax5, ax6, filepath)
+% This plot function is the same as compress_analysis.m except it accepts
+% figure axis handle so that the data could be plotted to the app UI
+% figure boxes, similar to AppBSliveplot.m
+
+sgtitle(filepath);
+
+[CurrentA, BiasV, Output3V, Input2V, Input3V, LIDemod1XA, LIDemod1YA, VbgV] = importcompressibility(filepath);
+vi = evalin('base','SETGlobal');
+
+
+dudn = Input2V./LIDemod1XA*(3/(5E3*9.14E15*1E9));
+plot(ax1, VbgV, smooth(dudn,5));  % Compressibility smoothed with span of 5
+title('Compressibility');
+% ylim([-4E-17, 2E-16]);
+
+
+plot(ax2, VbgV, LIDemod1XA*1E9);
+title('I2dAC');
+
+plot(ax3, VbgV, Input2V);
+title('IbgAC');
+
+
+plot(ax4, VbgV, -Output3V);
+title('V2dDC');
+delta_V2d = num2str(-Output3V(end)+Output3V(2));
+
+
+plot(ax5, VbgV, CurrentA); hold on;
+title('DC Current');
+
+Setpt = vi.GetControlValue('Setpt');
+Ampl = vi.GetControlValue('Amplitude');
+yline(Setpt);
+yline(Setpt+Ampl,'y');
+yline(Setpt-Ampl,'g');
+hold off;
+
+
+for i = 1:size(VbgV)-1
+    un(i) = trapz(dudn(1:i))*9.14E15*abs(VbgV(end)-VbgV(end-1));
+end
+plot(ax6, VbgV(2:end),un);
+ylabel('\mu/meV')
+title('\mu(n)');
+
+
+end
